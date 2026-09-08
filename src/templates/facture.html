@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Facture {{document.number}}</title>
+  <link rel="stylesheet" href="/src/templates/shared-print.css" />
+</head>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <div class="logo-box">
+        <img class="logo" src="{{workshop.logoUrl}}" alt="Logo" />
+        <div class="company">
+          <div>{{workshop.name}}</div>
+          <div>{{workshop.address}}</div>
+          <div>{{workshop.postalCode}} {{workshop.city}}</div>
+          <div>{{workshop.phone}} – {{workshop.email}}</div>
+          <div class="muted">SIRET: {{workshop.siret}} • TVA: {{workshop.vatNumber}} • RCS: {{workshop.rcs}}</div>
+        </div>
+      </div>
+      <div class="title-box">
+        <div class="doc-title">FACTURE</div>
+        <div class="doc-meta">
+          <div>N°</div><div>{{document.number}}</div>
+          <div>Date</div><div>{{document.date}}</div>
+          <div>Échéance</div><div>{{document.dueDate}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2 section">
+      <div>
+        <div class="h2">CLIENT</div>
+        <div>{{customer.name}}</div>
+        <div class="muted">{{customer.address}}</div>
+        <div class="muted">{{customer.postalCode}} {{customer.city}}</div>
+        <div class="muted">{{customer.phone}}</div>
+      </div>
+      <div>
+        <div class="h2">VÉHICULE</div>
+        <div>Marque/Modèle: {{vehicle.make}} {{vehicle.model}}</div>
+        <div>Immat.: {{vehicle.registration}}</div>
+        <div>VIN: {{vehicle.vin}}</div>
+        <div>Année: {{vehicle.year}}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <table>
+        <colgroup>
+          <col style="width:14%" />
+          <col style="width:46%" />
+          <col style="width:10%" />
+          <col style="width:10%" />
+          <col style="width:10%" />
+          <col style="width:10%" />
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Réf.</th>
+            <th>Description</th>
+            <th>Qté</th>
+            <th>PU HT</th>
+            <th>Remise</th>
+            <th>Montant HT</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each document.lines}}
+          <tr>
+            <td>{{ref}}</td>
+            <td>{{description}}</td>
+            <td style="text-align:right">{{quantity}}</td>
+            <td style="text-align:right">{{unitPrice}}</td>
+            <td style="text-align:right">{{discount}}</td>
+            <td style="text-align:right">{{lineTotal}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" style="display:flex; justify-content:flex-end">
+      <div class="totals">
+        <div class="totals-row"><span>Sous-total HT</span><span>{{totals.subtotal}}</span></div>
+        <div class="totals-row"><span>Total TVA</span><span>{{totals.vatTotal}}</span></div>
+        <div class="totals-row"><span>Total TTC</span><span>{{totals.grandTotal}}</span></div>
+        <div class="totals-row"><span>Acompte</span><span>{{totals.paid}}</span></div>
+        <div class="totals-row"><span>Reste à payer</span><span>{{totals.balance}}</span></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>{{workshop.address}} • {{workshop.phone}} • {{workshop.email}} • {{workshop.website}}</div>
+      <div class="muted">ICE/TVA: {{workshop.vatNumber}} • SIRET: {{workshop.siret}} • RCS: {{workshop.rcs}}</div>
+      <div class="note">Paiement à réception de facture</div>
+    </div>
+  </div>
+</body>
+</html>

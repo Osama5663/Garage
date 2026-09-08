@@ -1,0 +1,9 @@
+pieceauto.store, www.pieceauto.store {
+  redir / /garage/ 302
+  reverse_proxy app:8082
+}
+
+http://localhost, http://127.0.0.1 {
+  redir / /garage/ 302
+  reverse_proxy app:8082
+}

@@ -1,0 +1,302 @@
+/* Document Template Editor Styles */
+
+.template-editor {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Template Preview Styles */
+.template-section {
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+}
+
+.template-header {
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.template-header .company-logo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.template-header .company-logo img {
+  max-width: 200px;
+  max-height: 80px;
+  object-fit: contain;
+}
+
+.template-header .document-info {
+  text-align: center;
+}
+
+.template-header .document-info h1 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.template-header .document-info p {
+  margin: 5px 0;
+  color: #6b7280;
+}
+
+/* Body Section Styles */
+.template-body {
+  min-height: 400px;
+}
+
+.template-body .customer-info,
+.template-body .vehicle-info,
+.template-body .delivery-info {
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.template-body .customer-info h3,
+.template-body .vehicle-info h3,
+.template-body .delivery-info h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 5px;
+}
+
+.template-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.template-body table th,
+.template-body table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.template-body table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}
+
+.template-body table tbody tr:hover {
+  background: #f9fafb;
+}
+
+/* Footer Section Styles */
+.template-footer {
+  border-top: 2px solid #e5e7eb;
+  padding-top: 20px;
+  margin-top: 20px;
+}
+
+.template-footer .signature-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.template-footer .signature-line {
+  text-align: center;
+  flex: 1;
+  margin: 0 10px;
+}
+
+.template-footer .signature-line p {
+  margin: 10px 0;
+  color: #6b7280;
+}
+
+.template-footer .terms-conditions {
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.template-footer .page-info {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .template-header .document-info h1 {
+    font-size: 20px;
+  }
+  
+  .template-footer .signature-section {
+    flex-direction: column;
+  }
+  
+  .template-footer .signature-line {
+    margin: 10px 0;
+  }
+  
+  .template-body table {
+    font-size: 14px;
+  }
+  
+  .template-body table th,
+  .template-body table td {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .template-section {
+    padding: 15px;
+  }
+  
+  .template-header .document-info h1 {
+    font-size: 18px;
+  }
+  
+  .template-body table {
+    font-size: 12px;
+  }
+  
+  .template-body table th,
+  .template-body table td {
+    padding: 6px;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .template-section {
+    border: none;
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+  
+  .template-header {
+    border-bottom: 2px solid #000;
+  }
+  
+  .template-footer {
+    border-top: 2px solid #000;
+  }
+  
+  .template-body table th,
+  .template-body table td {
+    border-bottom: 1px solid #000;
+  }
+  
+  .template-body .customer-info,
+  .template-body .vehicle-info,
+  .template-body .delivery-info {
+    background: none;
+    border: 1px solid #000;
+  }
+  
+  .template-footer .terms-conditions {
+    background: none;
+    border: 1px solid #000;
+  }
+}
+
+/* Editor Styles */
+.template-editor-sidebar {
+  background: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+}
+
+.template-editor-content {
+  background: white;
+}
+
+.template-editor-textarea {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  tab-size: 2;
+}
+
+/* Variable Button Styles */
+.variable-button {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  font-family: monospace;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.variable-button:hover {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.variable-button:active {
+  background: #d1d5db;
+  transform: translateY(1px);
+}
+
+/* Preview Mode Styles */
+.template-preview-container {
+  background: #f3f4f6;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.template-preview-document {
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  max-width: 210mm;
+  margin: 0 auto;
+  min-height: 297mm;
+}
+
+/* Accessibility */
+.template-editor *:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.template-editor button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .template-section {
+    border: 2px solid #000;
+  }
+  
+  .template-header .document-info h1 {
+    color: #000;
+  }
+  
+  .template-body table th {
+    background: #000;
+    color: #fff;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .template-editor * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

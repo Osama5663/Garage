@@ -1,0 +1,7 @@
+{
+  "watch": ["api"],
+  "ext": "ts,mts,js,json",
+  "ignore": ["api/dist/*", "api/**/*.test.ts", "**/node_modules/**", "**/.git/**", "**/temp/**"],
+  "exec": "tsx api/_lib/server.ts",
+  "delay": 1000
+}

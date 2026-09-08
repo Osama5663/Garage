@@ -1,0 +1,127 @@
+/* Animation utilities for better UX */
+@keyframes slide-in-from-top {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-in {
+  animation-fill-mode: both;
+}
+
+.slide-in-from-top {
+  animation-name: slide-in-from-top;
+}
+
+.fade-in {
+  animation-name: fade-in;
+}
+
+.scale-in {
+  animation-name: scale-in;
+}
+
+.duration-300 {
+  animation-duration: 300ms;
+}
+
+.duration-200 {
+  animation-duration: 200ms;
+}
+
+/* Loading states */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Button hover effects */
+.transition-colors {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Motion reduction fallback */
+@media (prefers-reduced-motion: reduce) {
+  .transition-all,
+  .transition-colors,
+  .animate-in,
+  .fade-in,
+  .scale-in,
+  .slide-in-from-top {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Top bar collapse/expand */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  will-change: transform, box-shadow;
+  transition: transform 300ms ease-in-out, box-shadow 300ms ease-in-out;
+}
+
+.topbar-shadow {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 3px 6px rgba(0,0,0,0.08);
+}
+
+.topbar-collapsed {
+  transform: translateY(-100%);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.16);
+}
+
+/* Fallback for browsers without transform support */
+@supports not (transform: translateY(0)) {
+  .topbar { transition: max-height 300ms ease-in-out; }
+  .topbar-collapsed { max-height: 0; overflow: hidden; }
+}
+
+/* Form field focus effects */
+.focus\:ring-2:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+.focus\:ring-blue-500:focus {
+  --tw-ring-color: rgb(59 130 246 / 0.5);
+}
+
+.focus\:border-transparent:focus {
+  border-color: transparent;
+}

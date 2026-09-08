@@ -7,7 +7,6 @@ import { getMariaPool } from './config/mariadb.js';
 import { inventoryService } from './services/inventoryService.js';
 
 const startServer = async () => {
-  const isProd = String(process.env.NODE_ENV || '').toLowerCase() === 'production'
   let initError: unknown | null = null
 
   try {
@@ -16,7 +15,6 @@ const startServer = async () => {
   } catch (e) {
     initError = e
     console.error('Database init failed', e)
-    if (isProd) process.exit(1)
   }
 
   const PORT = process.env.PORT || 8084

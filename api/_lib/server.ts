@@ -17,7 +17,7 @@ const startServer = async () => {
     console.error('Database init failed', e)
   }
 
-  const PORT = process.env.PORT || 8084
+  const PORT = process.env.PORT || 8082
   const server = app.listen(PORT, () => {
     console.log(`Server ready on port ${PORT}`)
     if (initError) console.log('Server started without database connectivity')

@@ -1,6 +1,8 @@
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
     env_file:
       - .env
     environment:
@@ -9,11 +11,14 @@ services:
     depends_on:
       mariadb:
         condition: service_healthy
-    ports:
-      - "0.0.0.0:8082:8082"
+    expose:
+      - "8082"
     restart: unless-stopped
     networks:
       - garage
+    volumes:
+      - ./uploads:/app/uploads
+      - ./storage:/app/storage
 
   nginx:
     image: nginx:1.27-alpine

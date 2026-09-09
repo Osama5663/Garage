@@ -64,6 +64,10 @@ app.use('/api', templateRoutes)
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
 
+app.get('/', (_req: Request, res: Response) => {
+  res.redirect(302, '/garage/')
+})
+
 app.use(
   '/garage',
   express.static(distPath, {

@@ -21,7 +21,8 @@ services:
       - ./storage:/app/storage
 
   nginx:
-    image: nginx:1.27-alpine
+    build:
+      context: ./nginx
     depends_on:
       - app
     networks:
@@ -29,8 +30,6 @@ services:
     ports:
       - "80:80"
     restart: unless-stopped
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
 
   mariadb:
     image: mariadb:11

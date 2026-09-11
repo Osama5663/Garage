@@ -9,7 +9,7 @@ import { formatCurrency } from '../utils/formatters'
 const Dashboard = () => {
   const navigate = useNavigate()
   const { invoices } = useEstimateInvoiceStore()
-  const { jobOrders, deletionMeta } = useJobOrderStore()
+  const { getVisibleJobOrders } = useJobOrderStore()
   const [tick, setTick] = useState(0)
   const tr = (key: string, fallback: string) => {
     const v = t(key)
@@ -26,11 +26,10 @@ const Dashboard = () => {
   }, [invoices, tick])
   const recentJobs = useMemo(() => {
     const pickDate = (j: any) => new Date(j.createdAt || j.updatedAt || j.issueDate || Date.now()).getTime()
-    return [...(jobOrders || [])]
-      .filter(j => !deletionMeta[j.id]?.deletedAt)
+    return [...(getVisibleJobOrders() || [])]
       .sort((a, b) => pickDate(b) - pickDate(a))
       .slice(0, 3)
-  }, [jobOrders, deletionMeta, tick])
+  }, [getVisibleJobOrders, tick])
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">

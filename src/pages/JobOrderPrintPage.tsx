@@ -11,12 +11,12 @@ import { Printer } from 'lucide-react'
 export const JobOrderPrintPage: React.FC = () => {
   const { id } = useParams()
   const [sp] = useSearchParams()
-  const { jobOrders } = useJobOrderStore()
+  const { getVisibleJobOrders } = useJobOrderStore()
   const { customers } = useCustomerStore()
   const workshop = useWorkshopSettings()
   const canViewPrices = useHasRole(['admin','supervisor','cashier'])
   
-  const jobOrder = jobOrders.find(j => j.id === (id || ''))
+  const jobOrder = getVisibleJobOrders().find(j => j.id === (id || ''))
   
   // Auto-print if requested via query param
   useEffect(() => {

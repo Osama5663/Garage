@@ -40,6 +40,7 @@ interface JobOrderStore {
   removeLinkedEstimate: (jobId: string, estimateId: string) => void
   addEstimateAttachment: (jobId: string, file: JobOrder['diagnosticFiles'][0]) => void
   deleteEstimateAttachment: (jobId: string, fileId: string) => void
+  getVisibleJobOrders: () => JobOrder[]
   getFilteredJobOrders: () => JobOrder[]
   getJobOrderById: (id: string) => JobOrder | undefined
   getMechanicById: (id: string) => Mechanic | undefined
@@ -645,9 +646,19 @@ export const useJobOrderStore = create<JobOrderStore>()(
     )
   })),
 
-  getFilteredJobOrders: () => {
-    const { jobOrders, searchTerm, deletionMeta } = get()
+  getVisibleJobOrders: () => {
+    const { jobOrders, deletionMeta } = get()
     const active = jobOrders.filter(j => !deletionMeta[j.id]?.deletedAt)
+    const currentUser = useAuthStore.getState().currentUser
+    if (!currentUser) return active
+    if (currentUser.role !== 'mechanic') return active
+    if (!currentUser.mechanicId) return []
+    return active.filter(j => j.assignedMechanic === currentUser.mechanicId)
+  },
+
+  getFilteredJobOrders: () => {
+    const { searchTerm } = get()
+    const active = get().getVisibleJobOrders()
     if (!searchTerm) return active
 
     const term = searchTerm.toLowerCase()

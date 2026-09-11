@@ -46,7 +46,7 @@ import { PrintableVehicleCheckSheet } from '../components/PrintableVehicleCheckS
 const JobOrderDetail = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { jobOrders, addPartToJob, addLaborToJob, addImageToJob, deleteImageFromJob, updateJobStatus, updateJobOrder, approveJobOrder, isJobOrderReadyForApproval, markJobOrderAsTransferred } = useJobOrderStore()
+  const { getVisibleJobOrders, addPartToJob, addLaborToJob, addImageToJob, deleteImageFromJob, updateJobStatus, updateJobOrder, approveJobOrder, isJobOrderReadyForApproval, markJobOrderAsTransferred } = useJobOrderStore()
   const { mechanics, fetchMechanics } = useMechanicStore()
   const { createDeliveryNote, deliveryNotes, syncDeliveryNoteFromJobOrder } = useDeliveryNoteStore()
   const { inventoryItems, adjustStock } = useInventoryStore()
@@ -55,7 +55,7 @@ const JobOrderDetail = () => {
   const cashflowMovements = useCashflowStore((state) => state.movements)
   const workshop = useWorkshopSettings()
   
-  const jobOrder = jobOrders.find(job => job.id === id)
+  const jobOrder = getVisibleJobOrders().find(job => job.id === id)
   const { currentUser } = useAuthStore()
   const canApproveJobOrders = useHasPermission('APPROVE', 'job-orders')
   const canViewPrices = useHasRole(['admin','supervisor','cashier'])
@@ -109,7 +109,9 @@ const JobOrderDetail = () => {
     updateJobOrder(jobOrder.id, {
       description: editFormData.description,
       priority: editFormData.priority as any,
-      assignedMechanic: editFormData.assignedMechanic,
+      ...(currentUser?.role === 'mechanic'
+        ? {}
+        : { assignedMechanic: editFormData.assignedMechanic }),
       deadline: editFormData.deadline
     })
     setShowEditModal(false)
@@ -459,6 +461,77 @@ const JobOrderDetail = () => {
     })
   }
 
+  const handleInspectionEvidenceUpload = (
+    sectionId: string,
+    itemId: string,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
+
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const result = reader.result
+        if (typeof result !== 'string') return
+        const image: JobImage = {
+          id: `insp_${Date.now()}_${file.name}`,
+          url: result,
+          filename: file.name,
+          description: '',
+          uploadDate: new Date().toISOString().split('T')[0],
+          category: 'other'
+        }
+        setInspection(prev => {
+          const base = prev || createDefaultInspection()
+          return {
+            ...base,
+            sections: base.sections.map(section =>
+              section.id === sectionId
+                ? {
+                    ...section,
+                    items: section.items.map(item => {
+                      if (item.id !== itemId) return item
+                      const existing = item.evidenceImages || []
+                      return { ...item, evidenceImages: [...existing, image] }
+                    })
+                  }
+                : section
+            )
+          }
+        })
+      }
+      reader.readAsDataURL(file)
+    })
+
+    event.target.value = ''
+  }
+
+  const handleInspectionEvidenceDelete = (
+    sectionId: string,
+    itemId: string,
+    imageId: string
+  ) => {
+    setInspection(prev => {
+      const base = prev || createDefaultInspection()
+      return {
+        ...base,
+        sections: base.sections.map(section =>
+          section.id === sectionId
+            ? {
+                ...section,
+                items: section.items.map(item => {
+                  if (item.id !== itemId) return item
+                  const next = (item.evidenceImages || []).filter(img => img.id !== imageId)
+                  return { ...item, evidenceImages: next.length ? next : undefined }
+                })
+              }
+            : section
+        )
+      }
+    })
+  }
+
   const handleInspectionSave = () => {
     const base = inspection || createDefaultInspection()
     const mileageNumber = inspectionMileage ? Number(inspectionMileage) : undefined
@@ -702,6 +775,82 @@ const JobOrderDetail = () => {
     setter(prev => {
       const base = prev || creator()
       return { ...base, [field]: value }
+    })
+  }
+
+  const handleCheckSheetEvidenceUpload = (
+    kind: 'in' | 'out',
+    sectionId: string,
+    itemId: string,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return
+    const setter = kind === 'in' ? setCheckInSheet : setCheckOutSheet
+    const creator = kind === 'in' ? createDefaultCheckInSheet : createDefaultCheckOutSheet
+
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const result = reader.result
+        if (typeof result !== 'string') return
+        const image: JobImage = {
+          id: `chk_${Date.now()}_${file.name}`,
+          url: result,
+          filename: file.name,
+          description: '',
+          uploadDate: new Date().toISOString().split('T')[0],
+          category: 'other'
+        }
+        setter(prev => {
+          const base = prev || creator()
+          return {
+            ...base,
+            sections: base.sections.map(section =>
+              section.id === sectionId
+                ? {
+                    ...section,
+                    items: section.items.map(item => {
+                      if (item.id !== itemId) return item
+                      const existing = item.evidenceImages || []
+                      return { ...item, evidenceImages: [...existing, image] }
+                    })
+                  }
+                : section
+            )
+          }
+        })
+      }
+      reader.readAsDataURL(file)
+    })
+    event.target.value = ''
+  }
+
+  const handleCheckSheetEvidenceDelete = (
+    kind: 'in' | 'out',
+    sectionId: string,
+    itemId: string,
+    imageId: string
+  ) => {
+    const setter = kind === 'in' ? setCheckInSheet : setCheckOutSheet
+    const creator = kind === 'in' ? createDefaultCheckInSheet : createDefaultCheckOutSheet
+    setter(prev => {
+      const base = prev || creator()
+      return {
+        ...base,
+        sections: base.sections.map(section =>
+          section.id === sectionId
+            ? {
+                ...section,
+                items: section.items.map(item => {
+                  if (item.id !== itemId) return item
+                  const next = (item.evidenceImages || []).filter(img => img.id !== imageId)
+                  return { ...item, evidenceImages: next.length ? next : undefined }
+                })
+              }
+            : section
+        )
+      }
     })
   }
 
@@ -1478,6 +1627,7 @@ Les détails de l'erreur ont été enregistrés pour examen.`)
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Point de contrôle</th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">État</th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remarque</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preuve</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -1516,6 +1666,43 @@ Les détails de l'erreur ont été enregistrés pour examen.`)
                                   className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
                                   placeholder="Remarque..."
                                 />
+                              </td>
+                              <td className="px-4 py-2 align-top">
+                                <div className="flex items-center gap-2">
+                                  <label className="inline-flex items-center px-2 py-1 text-xs border border-gray-300 rounded cursor-pointer hover:bg-gray-50">
+                                    <Camera className="w-3 h-3 mr-1" />
+                                    Ajouter
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      multiple
+                                      className="hidden"
+                                      onChange={(e) => handleInspectionEvidenceUpload(section.id, item.id, e)}
+                                    />
+                                  </label>
+                                  {!!item.evidenceImages?.length && (
+                                    <div className="flex flex-wrap gap-1">
+                                      {item.evidenceImages.slice(0, 3).map((img) => (
+                                        <div key={img.id} className="relative">
+                                          <img src={img.url} alt={img.filename} className="h-8 w-8 object-cover border border-gray-200 rounded" />
+                                          <button
+                                            type="button"
+                                            onClick={() => handleInspectionEvidenceDelete(section.id, item.id, img.id)}
+                                            className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-0.5 hover:bg-gray-50"
+                                            title="Supprimer"
+                                          >
+                                            <Trash className="w-3 h-3 text-gray-600" />
+                                          </button>
+                                        </div>
+                                      ))}
+                                      {item.evidenceImages.length > 3 && (
+                                        <div className="h-8 px-2 flex items-center text-xs text-gray-600 border border-gray-200 rounded">
+                                          +{item.evidenceImages.length - 3}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           ))}
@@ -1649,6 +1836,7 @@ Les détails de l'erreur ont été enregistrés pour examen.`)
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Élément</th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vérifié</th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remarque</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preuve</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -1671,6 +1859,43 @@ Les détails de l'erreur ont été enregistrés pour examen.`)
                                   className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
                                   placeholder="Remarque..."
                                 />
+                              </td>
+                              <td className="px-4 py-2">
+                                <div className="flex items-center gap-2">
+                                  <label className="inline-flex items-center px-2 py-1 text-xs border border-gray-300 rounded cursor-pointer hover:bg-gray-50">
+                                    <Camera className="w-3 h-3 mr-1" />
+                                    Ajouter
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      multiple
+                                      className="hidden"
+                                      onChange={(e) => handleCheckSheetEvidenceUpload('in', section.id, item.id, e)}
+                                    />
+                                  </label>
+                                  {!!item.evidenceImages?.length && (
+                                    <div className="flex flex-wrap gap-1">
+                                      {item.evidenceImages.slice(0, 3).map((img) => (
+                                        <div key={img.id} className="relative">
+                                          <img src={img.url} alt={img.filename} className="h-8 w-8 object-cover border border-gray-200 rounded" />
+                                          <button
+                                            type="button"
+                                            onClick={() => handleCheckSheetEvidenceDelete('in', section.id, item.id, img.id)}
+                                            className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-0.5 hover:bg-gray-50"
+                                            title="Supprimer"
+                                          >
+                                            <Trash className="w-3 h-3 text-gray-600" />
+                                          </button>
+                                        </div>
+                                      ))}
+                                      {item.evidenceImages.length > 3 && (
+                                        <div className="h-8 px-2 flex items-center text-xs text-gray-600 border border-gray-200 rounded">
+                                          +{item.evidenceImages.length - 3}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           ))}
@@ -1794,6 +2019,7 @@ Les détails de l'erreur ont été enregistrés pour examen.`)
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Élément</th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vérifié</th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remarque</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preuve</th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -1816,6 +2042,43 @@ Les détails de l'erreur ont été enregistrés pour examen.`)
                                   className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
                                   placeholder="Remarque..."
                                 />
+                              </td>
+                              <td className="px-4 py-2">
+                                <div className="flex items-center gap-2">
+                                  <label className="inline-flex items-center px-2 py-1 text-xs border border-gray-300 rounded cursor-pointer hover:bg-gray-50">
+                                    <Camera className="w-3 h-3 mr-1" />
+                                    Ajouter
+                                    <input
+                                      type="file"
+                                      accept="image/*"
+                                      multiple
+                                      className="hidden"
+                                      onChange={(e) => handleCheckSheetEvidenceUpload('out', section.id, item.id, e)}
+                                    />
+                                  </label>
+                                  {!!item.evidenceImages?.length && (
+                                    <div className="flex flex-wrap gap-1">
+                                      {item.evidenceImages.slice(0, 3).map((img) => (
+                                        <div key={img.id} className="relative">
+                                          <img src={img.url} alt={img.filename} className="h-8 w-8 object-cover border border-gray-200 rounded" />
+                                          <button
+                                            type="button"
+                                            onClick={() => handleCheckSheetEvidenceDelete('out', section.id, item.id, img.id)}
+                                            className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-0.5 hover:bg-gray-50"
+                                            title="Supprimer"
+                                          >
+                                            <Trash className="w-3 h-3 text-gray-600" />
+                                          </button>
+                                        </div>
+                                      ))}
+                                      {item.evidenceImages.length > 3 && (
+                                        <div className="h-8 px-2 flex items-center text-xs text-gray-600 border border-gray-200 rounded">
+                                          +{item.evidenceImages.length - 3}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
                               </td>
                             </tr>
                           ))}
@@ -3005,6 +3268,7 @@ Les détails de l'erreur ont été enregistrés pour examen.`)
                     value={editFormData.assignedMechanic}
                     onChange={(e) => setEditFormData({ ...editFormData, assignedMechanic: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={currentUser?.role === 'mechanic'}
                   >
                     <option value="">Sélectionner un mécanicien</option>
                     {(mechanics || []).map(m => (

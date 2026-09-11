@@ -25,7 +25,7 @@ import {
 
 
 const GarageDashboard = () => {
-  const { jobOrders, updateJobStatus } = useJobOrderStore()
+  const { getVisibleJobOrders, updateJobStatus } = useJobOrderStore()
   const { mechanics } = useMechanicStore()
   const { customers } = useCustomerStore()
   
@@ -123,7 +123,7 @@ const GarageDashboard = () => {
 
 
   // Filter job orders to only show active vehicles in the garage
-  const activeJobs = jobOrders.filter(job => 
+  const activeJobs = getVisibleJobOrders().filter(job => 
     job.status !== 'cancelled' && job.status !== 'completed'
   )
 

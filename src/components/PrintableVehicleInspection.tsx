@@ -121,6 +121,7 @@ export const PrintableVehicleInspection: React.FC<PrintableVehicleInspectionProp
               <th className="py-3 px-4 text-left font-semibold text-gray-700 uppercase text-xs tracking-wider">Élément</th>
               <th className="py-3 px-4 text-left font-semibold text-gray-700 uppercase text-xs tracking-wider w-40">Statut</th>
               <th className="py-3 px-4 text-left font-semibold text-gray-700 uppercase text-xs tracking-wider">Commentaire</th>
+              <th className="py-3 px-4 text-left font-semibold text-gray-700 uppercase text-xs tracking-wider">Preuve</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
@@ -131,6 +132,25 @@ export const PrintableVehicleInspection: React.FC<PrintableVehicleInspectionProp
                   <td className="py-3 px-4 text-gray-900 font-medium">{item.label}</td>
                   <td className="py-3 px-4 text-gray-700">{statusLabel(item.status)}</td>
                   <td className="py-3 px-4 text-gray-700">{item.comment || '—'}</td>
+                  <td className="py-3 px-4 text-gray-700">
+                    {item.evidenceImages?.length ? (
+                      <div className="flex flex-wrap gap-2">
+                        {item.evidenceImages.slice(0, 2).map((img) => (
+                          <img
+                            key={img.id}
+                            src={img.url}
+                            alt={img.filename}
+                            className="h-10 w-10 object-cover border border-gray-200 rounded"
+                          />
+                        ))}
+                        {item.evidenceImages.length > 2 && (
+                          <span className="text-xs text-gray-600">+{item.evidenceImages.length - 2}</span>
+                        )}
+                      </div>
+                    ) : (
+                      '—'
+                    )}
+                  </td>
                 </tr>
               ))
             )}
@@ -160,4 +180,3 @@ export const PrintableVehicleInspection: React.FC<PrintableVehicleInspectionProp
 }
 
 export default PrintableVehicleInspection
-

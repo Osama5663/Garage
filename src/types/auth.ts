@@ -7,6 +7,7 @@ export interface User {
   firstName: string
   lastName: string
   role: UserRole
+  mechanicId?: string
   isActive: boolean
   lastLogin?: string
   createdAt: string

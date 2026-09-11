@@ -70,6 +70,7 @@ export interface VehicleCheckSheetItem {
   label: string
   checked: boolean
   note?: string
+  evidenceImages?: JobImage[]
 }
 
 export interface VehicleCheckSheetSection {
@@ -100,6 +101,7 @@ export interface InspectionItem {
   label: string
   status: InspectionStatus | null
   comment?: string
+  evidenceImages?: JobImage[]
 }
 
 export interface InspectionSection {

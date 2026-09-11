@@ -67,6 +67,7 @@ const MOCK_USERS: User[] = [
     firstName: 'John',
     lastName: 'Smith',
     role: 'mechanic',
+    mechanicId: 'mech_1',
     isActive: true,
     lastLogin: new Date().toISOString(),
     createdAt: new Date().toISOString(),

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useAuthStore, useCurrentUser } from '../stores/authStore'
 import { User, UserRole } from '../types/auth'
+import { useMechanicStore } from '../stores/mechanicStore'
 import { Plus, Edit, Trash2, UserCheck, UserX, Shield, Wrench, DollarSign, Eye, FileText, Settings, Search, Key, ShieldCheck, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { t } from '../i18n'
@@ -12,6 +13,7 @@ interface UserFormData {
   firstName: string
   lastName: string
   role: UserRole
+  mechanicId?: string
   isActive: boolean
   password?: string
   confirmPassword?: string
@@ -35,6 +37,7 @@ const UserManagement: React.FC = () => {
     adminSetUserPassword,
     verifyCurrentPassword
   } = useAuthStore()
+  const { mechanics, fetchMechanics } = useMechanicStore()
   
   const [userList, setUserList] = useState<User[]>([])
   const [filteredUsers, setFilteredUsers] = useState<User[]>([])
@@ -61,6 +64,7 @@ const UserManagement: React.FC = () => {
     firstName: '',
     lastName: '',
     role: 'mechanic',
+    mechanicId: undefined,
     isActive: true,
     password: '',
     confirmPassword: ''
@@ -69,6 +73,7 @@ const UserManagement: React.FC = () => {
 
   useEffect(() => {
     loadUsers()
+    fetchMechanics()
   }, [])
 
   useEffect(() => {
@@ -110,6 +115,7 @@ const UserManagement: React.FC = () => {
 
     if (!formData.firstName.trim()) newErrors.firstName = t('userManagement.validation.firstNameRequired')
     if (!formData.lastName.trim()) newErrors.lastName = t('userManagement.validation.lastNameRequired')
+    if (formData.role === 'mechanic' && !formData.mechanicId) newErrors.mechanicId = 'Mechanic is required'
 
     // Password validation for new users
     if (!editingUser) {
@@ -150,6 +156,7 @@ const UserManagement: React.FC = () => {
             firstName: formData.firstName,
             lastName: formData.lastName,
             role: formData.role,
+            mechanicId: formData.role === 'mechanic' ? formData.mechanicId : undefined,
             isActive: formData.isActive
         })
         if (success) {
@@ -164,6 +171,7 @@ const UserManagement: React.FC = () => {
           firstName: formData.firstName,
           lastName: formData.lastName,
           role: formData.role,
+          mechanicId: formData.role === 'mechanic' ? formData.mechanicId : undefined,
           isActive: formData.isActive,
           failedLoginAttempts: 0
         }, formData.password)
@@ -275,6 +283,7 @@ const UserManagement: React.FC = () => {
       firstName: '',
       lastName: '',
       role: 'mechanic',
+      mechanicId: undefined,
       isActive: true,
       password: '',
       confirmPassword: ''
@@ -290,6 +299,7 @@ const UserManagement: React.FC = () => {
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
+      mechanicId: user.mechanicId,
       isActive: user.isActive
     })
     setShowForm(true)
@@ -435,6 +445,27 @@ const UserManagement: React.FC = () => {
                 </select>
                 <p className="mt-1 text-xs text-gray-500">{getRoleDescription(formData.role)}</p>
               </div>
+
+              {formData.role === 'mechanic' && (
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Mechanic profile
+                  </label>
+                  <select
+                    value={formData.mechanicId || ''}
+                    onChange={(e) => setFormData({ ...formData, mechanicId: e.target.value || undefined })}
+                    className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm ${
+                      errors.mechanicId ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                  >
+                    <option value="">Select mechanic</option>
+                    {mechanics.map((m) => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
+                    ))}
+                  </select>
+                  {errors.mechanicId && <p className="mt-1 text-sm text-red-600">{errors.mechanicId}</p>}
+                </div>
+              )}
 
               {/* Password fields only for new users */}
               {!editingUser && (
